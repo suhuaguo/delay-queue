@@ -29,7 +29,7 @@ const (
 
 type Config struct {
 	BindAddress       string      // http server 监听地址
-	BucketSize        int         // bucket数量
+	BucketSize        int         // bucket数量,timer 的数量
 	BucketName        string      // bucket在redis中的键名,
 	QueueName         string      // ready queue在redis中的键名
 	QueueBlockTimeout int         // 调用blpop阻塞超时时间, 单位秒, 修改此项, redis.read_timeout必须做相应调整
@@ -63,6 +63,7 @@ func (config *Config) parse(path string) {
 		log.Fatalf("无法解析配置文件#%s", err.Error())
 	}
 
+	// bucket 参数
 	section := file.Section("")
 	config.BindAddress = section.Key("bind_address").MustString(DefaultBindAddress)
 	config.BucketSize = section.Key("bucket_size").MustInt(DefaultBucketSize)
@@ -70,6 +71,7 @@ func (config *Config) parse(path string) {
 	config.QueueName = section.Key("queue_name").MustString(DefaultQueueName)
 	config.QueueBlockTimeout = section.Key("queue_block_timeout").MustInt(DefaultQueueBlockTimeout)
 
+	// redis 相关的参数
 	config.Redis.Host = section.Key("redis.host").MustString(DefaultRedisHost)
 	config.Redis.Db = section.Key("redis.db").MustInt(DefaultRedisDb)
 	config.Redis.Password = section.Key("redis.password").MustString(DefaultRedisPassword)
@@ -80,6 +82,7 @@ func (config *Config) parse(path string) {
 	config.Redis.WriteTimeout = section.Key("redis.write_timeout").MustInt(DefaultRedisWriteTimeout)
 }
 
+// 初始化默认参数
 func (config *Config) initDefaultConfig() {
 	config.BindAddress = DefaultBindAddress
 	config.BucketSize = DefaultBucketSize

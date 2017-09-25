@@ -9,13 +9,16 @@ type BucketItem struct {
 	jobId     string
 }
 
+// 将会从这里进行获取
 func pushToBucket(key string, timestamp int64, jobId string) error {
 	_, err := execRedisCommand("ZADD", key, timestamp, jobId)
 
 	return err
 }
 
+// todo ZRANGE
 func getFromBucket(key string) (*BucketItem, error) {
+	// 返回有序集 key 中，指定区间内的成员。其中成员的位置按 score 值递增(从小到大)来排序。
 	value, err := execRedisCommand("ZRANGE", key, 0, 0, "WITHSCORES")
 	if err != nil {
 		return nil, err

@@ -7,6 +7,8 @@ import (
 
 type ReadyQueue struct{}
 
+// 将消息放到 redis
+// http://www.redis.cn/commands/rpush.html
 func pushToReadyQueue(queueName string, jobId string) error {
 	queueName = fmt.Sprintf(config.Setting.QueueName, queueName)
 	_, err := execRedisCommand("RPUSH", queueName, jobId)
@@ -20,7 +22,11 @@ func blockPopFromReadyQueue(queues []string, timeout int) (string, error) {
 		queue = fmt.Sprintf(config.Setting.QueueName, queue)
 		args = append(args, queue)
 	}
+
+
 	args = append(args, timeout)
+
+	// http://www.redis.cn/commands/blpop.html
 	value, err := execRedisCommand("BLPOP", args...)
 	if err != nil {
 		return "", err

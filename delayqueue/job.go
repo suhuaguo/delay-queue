@@ -5,11 +5,11 @@ import (
 )
 
 type Job struct {
-	Topic string `json:"topic"`
-	Id    string `json:"id"`    // job唯一标识ID
+	Topic string `json:"topic"` // topic ，唯一
+	Id    string `json:"id"`    // job唯一标识ID 。客户端需要保证唯一性
 	Delay int64  `json:"delay"` // 延迟时间, unix时间戳
-	TTR   int64  `json:"ttr"`
-	Body  string `json:"body"`
+	TTR   int64  `json:"ttr"`   // 超时时间
+	Body  string `json:"body"`  // body
 }
 
 // 获取Job

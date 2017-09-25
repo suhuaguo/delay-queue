@@ -50,6 +50,8 @@ func Push(resp http.ResponseWriter, req *http.Request) {
 
 	log.Printf("add job#%+v\n", job)
 	job.Delay = time.Now().Unix() + job.Delay
+
+	// 添加一个Job到队列中，Job、Bucket 中，
 	err = delayqueue.Push(job)
 
 	if err != nil {

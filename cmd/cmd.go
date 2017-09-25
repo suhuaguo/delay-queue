@@ -31,7 +31,7 @@ func (cmd *Cmd) Run() {
 		fmt.Println(AppVersion)
 		os.Exit(0)
 	}
-	// 初始化配置
+	// 初始化配置，参数配置，redis 设置
 	config.Init(configFile)
 	// 初始化队列
 	delayqueue.Init()

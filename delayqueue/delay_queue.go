@@ -16,8 +16,11 @@ var (
 )
 
 func Init() {
+	// 初始化 redis 连接池
 	RedisPool = initRedisPool()
+
 	initTimers()
+
 	bucketNameChan = generateBucketName()
 }
 
@@ -32,6 +35,7 @@ func Push(job Job) error {
 		log.Printf("添加job到job pool失败#job-%+v#%s", job, err.Error())
 		return err
 	}
+
 	err = pushToBucket(<-bucketNameChan, job.Delay, job.Id)
 	if err != nil {
 		log.Printf("添加job到bucket失败#job-%+v#%s", job, err.Error())
@@ -98,8 +102,11 @@ func initTimers() {
 	timers = make([]*time.Ticker, config.Setting.BucketSize)
 	var bucketName string
 	for i := 0; i < config.Setting.BucketSize; i++ {
+
 		timers[i] = time.NewTicker(1 * time.Second)
+
 		bucketName = fmt.Sprintf(config.Setting.BucketName, i+1)
+
 		go waitTicker(timers[i], bucketName)
 	}
 }
@@ -116,6 +123,7 @@ func waitTicker(timer *time.Ticker, bucketName string) {
 // 扫描bucket, 取出延迟时间小于当前时间的Job
 func tickHandler(t time.Time, bucketName string) {
 	for {
+		// 拿到第一个元素
 		bucketItem, err := getFromBucket(bucketName)
 		if err != nil {
 			log.Printf("扫描bucket错误#bucket-%s#%s", bucketName, err.Error())
@@ -149,11 +157,14 @@ func tickHandler(t time.Time, bucketName string) {
 		if job.Delay > t.Unix() {
 			// 重新计算delay时间并放入bucket中
 			pushToBucket(<-bucketNameChan, job.Delay, bucketItem.jobId)
+
 			// 从bucket中删除之前的bucket
 			removeFromBucket(bucketName, bucketItem.jobId)
+
 			continue
 		}
 
+		// 放到 Ready 队列中，普通的 redis list 即可
 		err = pushToReadyQueue(job.Topic, bucketItem.jobId)
 		if err != nil {
 			log.Printf("JobId放入ready queue失败#bucket-%s#job-%+v#%s",
