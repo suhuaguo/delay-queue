@@ -54,7 +54,7 @@ func (cmd *Cmd) runWeb() {
 	http.HandleFunc("/pop", routers.Pop)
 	http.HandleFunc("/finish", routers.Delete)
 	http.HandleFunc("/delete", routers.Delete)
-	http.HandleFunc("/get", routers.Get)
+	http.HandleFunc("/get", routers.Get) // 查询 job
 
 	log.Printf("listen %s\n", config.Setting.BindAddress)
 	err := http.ListenAndServe(config.Setting.BindAddress, nil)

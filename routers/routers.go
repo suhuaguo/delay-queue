@@ -50,6 +50,8 @@ func Push(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Printf("add job#%+v\n", job)
+
+	// 统一在代理层处理时间。防止时间不统一。
 	job.Delay = time.Now().Unix() + job.Delay
 
 	// 添加一个Job到队列中，Job、Bucket 中，
@@ -65,10 +67,12 @@ func Push(resp http.ResponseWriter, req *http.Request) {
 // 获取job
 func Pop(resp http.ResponseWriter, req *http.Request) {
 	var popRequest PopRequest
+
 	err := readBody(resp, req, &popRequest)
 	if err != nil {
 		return
 	}
+
 	topic := strings.TrimSpace(popRequest.Topic)
 	if topic == "" {
 		resp.Write(generateFailureBody("topic不能为空"))
@@ -77,6 +81,7 @@ func Pop(resp http.ResponseWriter, req *http.Request) {
 	// 多个topic逗号分隔
 	topics := strings.Split(topic, ",")
 	job, err := delayqueue.Pop(topics)
+
 	if err != nil {
 		log.Printf("获取job失败#%s", err.Error())
 		resp.Write(generateFailureBody("获取Job失败"))
@@ -116,7 +121,9 @@ func Delete(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// 删除 job
 	err = delayqueue.Remove(id)
+
 	if err != nil {
 		resp.Write(generateFailureBody("删除失败"))
 		return
@@ -172,7 +179,9 @@ type ResponseBody struct {
 }
 
 func readBody(resp http.ResponseWriter, req *http.Request, v interface{}) error {
+	// 一定要等到有error或EOF的时候才会返回结果，因此只能等到客户端退出时才会返回结果。
 	body, err := ioutil.ReadAll(req.Body)
+
 	if err != nil {
 		log.Printf("读取body错误#%s", err.Error())
 		resp.Write(generateFailureBody("读取request body失败"))
@@ -188,14 +197,17 @@ func readBody(resp http.ResponseWriter, req *http.Request, v interface{}) error 
 	return nil
 }
 
+// 成功：0
 func generateSuccessBody(msg string, data interface{}) []byte {
 	return generateResponseBody(0, msg, data)
 }
 
+// 失败：1
 func generateFailureBody(msg string) []byte {
 	return generateResponseBody(1, msg, nil)
 }
 
+// s
 func generateResponseBody(code int, msg string, data interface{}) []byte {
 	body := &ResponseBody{}
 	body.Code = code

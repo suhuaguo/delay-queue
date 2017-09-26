@@ -10,6 +10,7 @@ type ReadyQueue struct{}
 
 // 将消息放到 redis
 // http://www.redis.cn/commands/rpush.html
+// queueName:Topic
 func pushToReadyQueue(queueName string, jobId string) error {
 	queueName = fmt.Sprintf(config.Setting.QueueName, queueName)
 	_, err := execRedisCommand("RPUSH", queueName, jobId)

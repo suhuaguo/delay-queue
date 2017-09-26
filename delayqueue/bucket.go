@@ -5,8 +5,8 @@ import (
 )
 
 type BucketItem struct {
-	timestamp int64
-	jobId     string
+	timestamp int64  // 时间戳
+	jobId     string // jobId
 }
 
 // 将会从这里进行获取
@@ -32,6 +32,7 @@ func getFromBucket(key string) (*BucketItem, error) {
 	if len(valueBytes) == 0 {
 		return nil, nil
 	}
+
 	timestampStr := string(valueBytes[1].([]byte))
 	item := &BucketItem{}
 	item.timestamp, err = strconv.ParseInt(timestampStr, 10, 64)
