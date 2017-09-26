@@ -77,7 +77,7 @@ func Pop(topics []string) (*Job, error) {
 		return nil, nil
 	}
 
-	// 重新放到 Bucket 中，等待重新消费。实现至少一次的逻辑。如果客户端删除了 job ，那么。调度到此 jobId 的时候，发现 job 不存在，直接在 bucket 中删除 此 jobId
+	// 重新放到 Bucket 中，等待重新消费。实现至少一次的逻辑。如果客户端删除了 job ，那么。调度到此 jobId 的时候，发现 job 不存在，直接在 bucket 中删除
 	timestamp := time.Now().Unix() + job.TTR
 	err = pushToBucket(<-bucketNameChan, timestamp, job.Id)
 
