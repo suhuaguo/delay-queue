@@ -12,7 +12,7 @@ import (
 var (
 	// 每个定时器对应一个bucket
 	timers []*time.Ticker
-	// bucket名称chan
+	// bucket名称chan 。声明一个  传输整形  string  chan,（接收消息和发送消息者将会阻塞，直到channel ”可用“）
 	bucketNameChan <-chan string
 )
 
@@ -23,7 +23,8 @@ func Init() {
 	// 初始化一些列 Timer
 	initTimers()
 
-	// TODO   产生 bucket name  TODO 看不懂
+	// golang 函数：http://blog.csdn.net/mungo/article/details/52481285
+	// 进行初始化，产生一个 go routine
 	bucketNameChan = generateBucketName()
 }
 
@@ -79,6 +80,7 @@ func Pop(topics []string) (*Job, error) {
 
 	// 重新放到 Bucket 中，等待重新消费。实现至少一次的逻辑。如果客户端删除了 job ，那么。调度到此 jobId 的时候，发现 job 不存在，直接在 bucket 中删除
 	timestamp := time.Now().Unix() + job.TTR
+	// 表示从 <-bucketNameChan 。这个 channel 接收一个值
 	err = pushToBucket(<-bucketNameChan, timestamp, job.Id)
 
 	return job, err
@@ -107,12 +109,20 @@ func Get(jobId string) (*Job, error) {
 func generateBucketName() <-chan string {
 	// 阻塞 channel
 	c := make(chan string)
-	// 启动并发？为什么这么写呢？为什么不直接写个 for 死循环呢？
+	// 1、为什么这么写呢？为什么不直接写个 for 死循环呢？
+	// 如果直接写 for 循环，那在初始化的时候，会阻塞其他 init 函数。
+
+	// 2、每次都 产生一个 go routine 。是怎么销毁的呀？
+	// 因为把这个函数 赋给某个 变量了。在 init 中初始化了
+
+	// 3、我感觉到 里面的 i 变量好像没有作用的呀，因为都没有和其他 go routine 交换。
+	// 因为在 初始化 init 一下。每次都从 bucketNameChan 这个 channel 读取信息。
 	go func() {
 		i := 1
 
 		// 死循环
 		for {
+			// chan <-  发送消息
 			c <- fmt.Sprintf(config.Setting.BucketName, i)
 			if i >= config.Setting.BucketSize {
 				i = 1
