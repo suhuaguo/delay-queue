@@ -24,6 +24,7 @@ const (
 	AppVersion = "0.3"
 )
 
+// 是在 main.go 中运行的。直接调用 run 方法
 func (cmd *Cmd) Run() {
 
 	// 解析命令行参数

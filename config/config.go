@@ -48,18 +48,27 @@ type RedisConfig struct {
 	WriteTimeout   int // 写入超时, 单位毫秒
 }
 
+// 初始化
 func Init(path string) {
+	// &Config{} ：结构体初始化
+	// http://blog.csdn.net/xxx9001/article/details/52574501 结构体初始化
 	Setting = &Config{}
+
 	if path == "" {
+		// 加载默认的配置文件
 		Setting.initDefaultConfig()
 		return
 	}
 
+	// 转换配置文件
 	Setting.parse(path)
 }
 
+// 转换配置信息。properties 文件
 func (config *Config) parse(path string) {
+	// 加载配置文件
 	file, err := ini.Load(path)
+
 	if err != nil {
 		log.Fatalf("无法解析配置文件#%s", err.Error())
 	}
@@ -87,8 +96,8 @@ func (config *Config) parse(path string) {
 func (config *Config) initDefaultConfig() {
 	config.BindAddress = DefaultBindAddress
 	config.BucketSize = DefaultBucketSize
-	config.BucketName = DefaultBucketName
-	config.QueueName = DefaultQueueName
+	config.BucketName = DefaultBucketName  //
+	config.QueueName = DefaultQueueName    // ready queue
 	config.QueueBlockTimeout = DefaultQueueBlockTimeout
 
 	config.Redis.Host = DefaultRedisHost
