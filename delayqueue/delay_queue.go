@@ -110,10 +110,10 @@ func generateBucketName() <-chan string {
 	// 阻塞 channel
 	c := make(chan string)
 	// 1、为什么这么写呢？为什么不直接写个 for 死循环呢？
-	// 如果直接写 for 循环，那在初始化的时候，会阻塞其他 init 函数。
+	// 如果直接写 for 循环，那在初始化的时候，会阻塞其他 init 函数。如果另起一个 go routine 的话，就不会阻塞其他的
 
 	// 2、每次都 产生一个 go routine 。是怎么销毁的呀？
-	// 因为把这个函数 赋给某个 变量了。在 init 中初始化了
+	// 因为把这个函数 赋给某个 变量了。在 init 中初始化了。只有一个 go routine 。
 
 	// 3、我感觉到 里面的 i 变量好像没有作用的呀，因为都没有和其他 go routine 交换。
 	// 因为在 初始化 init 一下。每次都从 bucketNameChan 这个 channel 读取信息。
