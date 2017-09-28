@@ -13,6 +13,7 @@ import (
 	"github.com/ouqiang/delay-queue/routers"
 )
 
+// 直接使用struct{} 来初始化strut时，返回的是一个struct类型的值，而不是指针两者是不一样的
 type Cmd struct{}
 
 var (
@@ -47,10 +48,12 @@ func (cmd *Cmd) parseCommandArgs() {
 	flag.StringVar(&configFile, "c", "", "./delay-queue -c /path/to/delay-queue.conf")
 	// 版本
 	flag.BoolVar(&version, "v", false, "./delay-queue -v")
+	// 生成命令
 	flag.Parse()
 }
 
 func (cmd *Cmd) runWeb() {
+
 	http.HandleFunc("/push", routers.Push)
 	http.HandleFunc("/pop", routers.Pop)
 	http.HandleFunc("/finish", routers.Delete)
