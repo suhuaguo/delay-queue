@@ -54,6 +54,7 @@ func (cmd *Cmd) parseCommandArgs() {
 
 func (cmd *Cmd) runWeb() {
 
+	// 有详细的说明：https://studygolang.com/resources/4657 讲的非常详细
 	http.HandleFunc("/push", routers.Push)
 	http.HandleFunc("/pop", routers.Pop)
 	http.HandleFunc("/finish", routers.Delete)
@@ -61,6 +62,8 @@ func (cmd *Cmd) runWeb() {
 	http.HandleFunc("/get", routers.Get) // 查询 job
 
 	log.Printf("listen %s\n", config.Setting.BindAddress)
+
+
 	err := http.ListenAndServe(config.Setting.BindAddress, nil)
 	if err != nil {
 		log.Fatalln(err)
