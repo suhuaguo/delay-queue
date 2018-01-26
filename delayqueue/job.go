@@ -4,6 +4,7 @@ import (
 	"github.com/vmihailenco/msgpack"
 )
 
+// 每个延迟队列都是一个 job
 type Job struct {
 	Topic string `json:"topic"` // topic ，唯一
 	Id    string `json:"id"`    // job唯一标识ID 。客户端需要保证唯一性。有关联关系的

@@ -144,6 +144,7 @@ func initTimers() {
 		 // 每 1s 执行一次
 		timers[i] = time.NewTicker(1 * time.Second)
 
+		// 如果这里部署多实例的话，就会产生竞争
 		bucketName = fmt.Sprintf(config.Setting.BucketName, i+1)
 
 		// 并发执行
